@@ -18,7 +18,7 @@ metadata_file = "metadata.csv"
 micro_nuclei_max_area = 2500
 # Pixel to micron values for the HPA dataset and for OpenCell dataset. Used to resize the crop later on
 pixel_micron_HPA = 0.0800885
-pixel_micron_OpenCell = 0.2
+pixel_micron_OpenCell = 0.206349
 # Final crop size
 crop_size_orig = 256
 crop_size_orig_hf = int(crop_size_orig / 2)

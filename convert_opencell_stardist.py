@@ -25,7 +25,7 @@ crop_size_orig_hf = int(crop_size_orig / 2)
 crop_size_resized = 640
 crop_size_resized_hf = int(crop_size_resized / 2)
 
-
+model = StarDist2D.from_pretrained('2D_versatile_fluo')
 os.makedirs(output_folder, exist_ok=True)
 mf = open(os.path.join(output_folder, metadata_file), "w")
 # Metadata headers
@@ -45,7 +45,6 @@ for input_image in os.listdir(input_folder):
     # Normalizing image (Stardist requirement)
     np_img_nuc_norm = (np_img_nuc - np.amin(np_img_nuc)) / (np.amax(np_img_nuc) - np.amin(np_img_nuc))
     # Running Stardist segmentation to obtain a labeled image with segmented nuclei
-    model = StarDist2D.from_pretrained('2D_versatile_fluo')
     nuc_labels, _ = model.predict_instances_big(np_img_nuc_norm, axes='YX', block_size=512, min_overlap=64)
     # Removing segmented nuclei with less area/pixels than micro_nuclei_max_area
     nuc_labels = remove_small_objects(nuc_labels, micro_nuclei_max_area)

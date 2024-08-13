@@ -1,8 +1,8 @@
-# Subcell Validation Data
+# Subcell Data
 This repo contains the code to: 
-- Process OpenCell and AllenCell data so they can be used for SubCell validation purposes.
+- Process OpenCell and AllenCell data for SubCell benchmarking.
 - Put the above processed data into an appropriate S3 bucket for our AI residents.
-- Gather both training data and validation to a public location to accompany paper publication. 
+- Gather all datasets used in the SubCell paper to a public location to accompany paper publication. 
 
 ## Code of Conduct
 

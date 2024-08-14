@@ -1,10 +1,12 @@
+import os
 import numpy as np
 import pandas as pd
 
 
 # Upstream metadata from https://github.com/AllenCell/cvapipe_analysis 
 # Only using the columns with IDs: csvcut -c 1,3,9 manifest.csv > manifest_IDs.csv
-meta_allen_upstream = pd.read_csv("manifest_IDs.csv")
+here = os.path.dirname(__file__)
+meta_allen_upstream = pd.read_csv(os.path.join(here, "AllenCell_manifest_IDs.csv"))
 # Create a column to store image name without folder name
 meta_allen_upstream["image"] = meta_allen_upstream["crop_raw"].str.replace("crop_raw/", "")
 
@@ -16,7 +18,7 @@ meta_allen_upstream["gene_name"] = meta_allen_upstream["structure_name"].str.rep
 
 # Add Ensembl ID by matching gene name
 # Load conversion table from https://www.ensembl.org/biomart/martview Ensembl Genes 112
-gene_id = pd.read_table("biomart_export_ensembl112.tsv")
+gene_id = pd.read_table(os.path.join(here, "AllenCell_biomart_export_ensembl112.tsv"))
 
 meta_allen_upstream_ensembl = meta_allen_upstream.merge(gene_id, how="left", left_on="gene_name", right_on="Gene name")
 
@@ -54,7 +56,7 @@ meta_allen_final = pd.DataFrame({
     "cell_id": 1,
     "nucleus_area": np.nan,
     "cell_area": np.nan,
-    "resized_image_name": np.nan   # TO DO: add this column
+    "resized_image_name": meta_allen["resz_image"],
 })
 
 meta_allen_final.to_csv("allencell.metadata.formatted.csv", index=False)

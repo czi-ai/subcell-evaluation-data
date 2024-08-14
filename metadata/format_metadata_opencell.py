@@ -27,7 +27,7 @@ meta_open_final = pd.DataFrame({
     "cell_id": meta_open["cell_id"],
     "nucleus_area": meta_open["resz_nuc_area"],
     "cell_area": np.nan,
-    "resized_image_name": np.nan   # TO DO: add this column
+    "resized_image_name": meta_open["resz_image"],
 })
 
 

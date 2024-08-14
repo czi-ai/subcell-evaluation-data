@@ -20,7 +20,7 @@ crop_size_hf = int(crop_size / 2)
 os.makedirs(output_folder, exist_ok=True)
 mf = open(os.path.join(output_folder, metadata_file), "w")
 # Metadata headers
-mf.write("image,orig_img_width,orig_img_height,resz_img_width,resz_img_height\n")
+mf.write("image,orig_img_width,orig_img_height,resz_image,resz_img_width,resz_img_height\n")
 
 for input_image in os.listdir(input_folder):
     # Reading the tif file as numpy array
@@ -44,9 +44,10 @@ for input_image in os.listdir(input_folder):
     crop[(crop_size_hf - center_y):(crop_size_hf + center_y), (crop_size_hf - center_x):(crop_size_hf + center_x)] = max_proj[(int(len(max_proj) / 2) - center_y):(int(len(max_proj) / 2) + center_y),(int(len(max_proj[0]) / 2) - center_x):(int(len(max_proj[0]) / 2) + center_x)]
 
     # Saving the crop of the resized image
-    cv2.imwrite(os.path.join(output_folder, input_image).replace(".tif", "_crop_resized.png"), np.uint16(crop))
+    resz_image_fn = os.path.join(output_folder, input_image).replace(".tif", "_crop_resized.png")
+    cv2.imwrite(resz_image_fn, np.uint16(crop))
     # Saving the resized crop data for the current image
-    crop_data = crop_data + "," + str(len(max_proj[0])) + "," + str(len(max_proj))
+    crop_data = crop_data + "," + os.path.basename(resz_image_fn) + "," + str(len(max_proj[0])) + "," + str(len(max_proj))
 
     # Writing the current image crops information in the metadata file
     mf.write(crop_data + "\n")

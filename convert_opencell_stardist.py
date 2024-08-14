@@ -29,7 +29,7 @@ model = StarDist2D.from_pretrained('2D_versatile_fluo')
 os.makedirs(output_folder, exist_ok=True)
 mf = open(os.path.join(output_folder, metadata_file), "w")
 # Metadata headers
-mf.write("image,cell_id,orig_img_width,orig_img_height,orig_center_x,orig_center_y,orig_nuc_area,resz_img_width,resz_img_height,resz_center_x,resz_center_y,resz_nuc_area\n")
+mf.write("image,cell_id,orig_img_width,orig_img_height,orig_center_x,orig_center_y,orig_nuc_area,resz_image,resz_img_width,resz_img_height,resz_center_x,resz_center_y,resz_nuc_area\n")
 
 for input_image in os.listdir(input_folder):
     crops_data = []
@@ -94,9 +94,10 @@ for input_image in os.listdir(input_folder):
         crop[(crop_size_resized_hf - (center_image[0] - crop_top)):(crop_size_resized_hf + (crop_bottom - center_image[0])), (crop_size_resized_hf - (center_image[1] - crop_left)):(crop_size_resized_hf + (crop_right - center_image[1])), 0] = np_img_nuc[crop_top:crop_bottom, crop_left:crop_right]
 
         # Saving the crop of the resized image
-        cv2.imwrite(os.path.join(output_folder, input_image).replace("_proj.tif", "_crop_" + str(curr_crop.label) + "_resized.png"), np.uint16(crop))
+        resz_image_fn = os.path.join(output_folder, input_image).replace("_proj.tif", "_crop_" + str(curr_crop.label) + "_resized.png")
+        cv2.imwrite(resz_image_fn, np.uint16(crop))
         # Adding the resized crops data for the current image
-        crops_data[curr_crop.label - 1] = crops_data[curr_crop.label - 1] + "," + str(len(np_img_nuc[0])) + "," + str(len(np_img_nuc)) + "," + str(center_image[1]) + "," + str(center_image[0]) + "," + str(int(curr_crop.area))
+        crops_data[curr_crop.label - 1] = crops_data[curr_crop.label - 1] + "," + os.path.basename(resz_image_fn) + "," + str(len(np_img_nuc[0])) + "," + str(len(np_img_nuc)) + "," + str(center_image[1]) + "," + str(center_image[0]) + "," + str(int(curr_crop.area))
 
     # Writing the current image crops information in the metadata file
     mf.write("\n".join(crops_data) + "\n")

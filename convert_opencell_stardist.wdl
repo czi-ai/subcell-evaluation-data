@@ -19,9 +19,16 @@ workflow convert_opencell_stardist {
         docker
     }
 
+    call format_opencell_metadata {
+        input:
+        metadata_csv = convert_opencell_stardist_task.metadata_csv,
+        docker
+    }
+
     output {
         Directory images = convert_opencell_stardist_task.images_out
         File metadata_csv = convert_opencell_stardist_task.metadata_csv
+        File metadata_formatted_csv = format_opencell_metadata.metadata_formatted_csv
     }
 }
 
@@ -92,7 +99,7 @@ task convert_opencell_stardist_task {
         # setting HDF5_USE_FILE_LOCKING=FALSE and --retries overcomes some sporadic problems with
         # StarDist reading its TensorFlow model file.
         export HDF5_USE_FILE_LOCKING=FALSE
-        >&2 parallel --retries 5 --verbose --tag 'echo "shard {} start" && cd shards/{} && python3 /SubCell/convert_opencell_stardist.py && echo "shard {} done"' ::: $(seq 1 ~{shards})
+        >&2 parallel --retries 10 --verbose --tag 'echo "shard {} start" && cd shards/{} && python3 /SubCell/convert_opencell_stardist.py && echo "shard {} done"' ::: $(seq 1 ~{shards})
 
         # collect all output files into a single directory
         mkdir -p opencell
@@ -101,8 +108,8 @@ task convert_opencell_stardist_task {
         >&2 echo "Images out: $n_images_out"
 
         # concatenate all the shards' metadata.csv (avoiding duplicating the header line)
-        head -n 1 shards/1/result/opencell/metadata.csv > metadata.csv
-        find shards -name metadata.csv -exec tail -n +2 {} \; >> metadata.csv
+        head -n 1 shards/1/result/opencell/metadata.csv > opencell.metadata.csv
+        find shards -name metadata.csv -exec tail -n +2 {} \; >> opencell.metadata.csv
     >>>
 
     runtime {
@@ -113,6 +120,29 @@ task convert_opencell_stardist_task {
 
     output {
         Directory images_out = "opencell"
-        File metadata_csv = "metadata.csv"
+        File metadata_csv = "opencell.metadata.csv"
+    }
+}
+
+task format_opencell_metadata {
+    input {
+        File metadata_csv
+        String docker
+    }
+
+    command <<<
+        set -euo pipefail
+        cp '~{metadata_csv}' opencell.metadata.csv
+        python3 /SubCell/metadata/format_metadata_opencell.py
+    >>>
+
+    runtime {
+        cpu: 2
+        memory: "16G"
+        docker: docker
+    }
+
+    output {
+        File metadata_formatted_csv = "opencell.metadata.formatted.csv"
     }
 }

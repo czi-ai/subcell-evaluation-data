@@ -11,9 +11,16 @@ workflow convert_allencell {
         raw_images, docker
     }
 
+    call format_allencell_metadata {
+        input:
+        metadata_csv = convert_allencell_task.metadata_csv,
+        docker
+    }
+
     output {
         Directory images = convert_allencell_task.images_out
         File metadata_csv = convert_allencell_task.metadata_csv
+        File metadata_formatted_csv = format_allencell_metadata.metadata_formatted_csv
     }
 }
 
@@ -52,8 +59,8 @@ task convert_allencell_task {
         >&2 echo "Images out: $n_images_out"
 
         # concatenate all the shards' metadata.csv (avoiding duplicating the header line)
-        head -n 1 shards/1/result/allencell/metadata.csv > metadata.csv
-        find shards -name metadata.csv -exec tail -n +2 {} \; >> metadata.csv
+        head -n 1 shards/1/result/allencell/metadata.csv > allencell.metadata.csv
+        find shards -name metadata.csv -exec tail -n +2 {} \; >> allencell.metadata.csv
     >>>
 
     runtime {
@@ -64,6 +71,29 @@ task convert_allencell_task {
 
     output {
         Directory images_out = "allencell"
-        File metadata_csv = "metadata.csv"
+        File metadata_csv = "allencell.metadata.csv"
+    }
+}
+
+task format_allencell_metadata {
+    input {
+        File metadata_csv
+        String docker
+    }
+
+    command <<<
+        set -euo pipefail
+        cp '~{metadata_csv}' allencell.metadata.csv
+        python3 /SubCell/metadata/format_metadata_allencell.py
+    >>>
+
+    runtime {
+        cpu: 2
+        memory: "16G"
+        docker: docker
+    }
+
+    output {
+        File metadata_formatted_csv = "allencell.metadata.formatted.csv"
     }
 }

@@ -1,6 +1,20 @@
 FROM ubuntu:24.04
-RUN apt update && apt-get install parallel python3-pip ffmpeg libsm6 libxext6 libpng16-16t64 -y
-RUN pip3 install --break-system-packages tifffile 'numpy<2' opencv-python stardist scikit-image tensorflow awscli
+RUN apt update && apt-get install -y \
+    parallel \
+    python3-pip \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libpng16-16t64
+RUN pip3 install --break-system-packages \
+    tifffile \
+    'numpy<2' \
+    opencv-python \
+    stardist \
+    scikit-image \
+    tensorflow \
+    awscli \
+    pandas
 
 # Place StarDist model file at expected Keras cache location; otherwise, the model loader tries to
 # download it at runtime, which is a reliability issue running at scale.
@@ -8,3 +22,4 @@ ADD https://github.com/stardist/stardist-models/releases/download/v0.1/python_2D
 
 RUN mkdir /SubCell
 COPY convert_allencell.py convert_opencell_stardist.py /SubCell/
+COPY metadata /SubCell/metadata

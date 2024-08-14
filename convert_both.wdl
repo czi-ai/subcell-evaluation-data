@@ -29,7 +29,9 @@ workflow convert_both {
     output {
         Directory allencell_images = convert_allencell.images
         File allencell_metadata_csv = convert_allencell.metadata_csv
+        File allencell_metadata_formatted_csv = convert_allencell.metadata_formatted_csv
         Directory opencell_images = convert_opencell_stardist.images
         File opencell_metadata_csv = convert_opencell_stardist.metadata_csv
+        File opencell_metadata_formatted_csv = convert_opencell_stardist.metadata_formatted_csv
     }
 }

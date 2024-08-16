@@ -44,11 +44,10 @@ task localize_images {
 
     command <<<
         set -euxo pipefail
-        aws s3 ls --no-sign-request --recursive '~{s3bucket}~{s3prefix}' | grep '~{pattern}' | awk '{print $4}' | shuf > suffixes_pre.txt
-        head -n 100 suffixes_pre.txt > suffixes.txt # FIXME
+        aws s3 ls --no-sign-request --recursive '~{s3bucket}~{s3prefix}' | grep '~{pattern}' | awk '{print $4}' | shuf > suffixes.txt
 
         mkdir opencell
-        >&2 parallel --verbose 'aws s3 cp --no-sign-request ~{s3bucket}{} opencell/{/}' :::: suffixes.txt
+        >&2 parallel -j 16 --verbose 'aws s3 cp --no-sign-request ~{s3bucket}{} opencell/{/}' :::: suffixes.txt
 
         # check that all files were downloaded (without filename collisions)
         n_suffixes=$(cat suffixes.txt | wc -l)
@@ -73,7 +72,7 @@ task localize_images {
 task convert_opencell_stardist_task {
     input {
         Directory images_in
-        Int cpu = 8 # 64
+        Int cpu = 64
         Int shards = cpu*4
         String docker
     }
@@ -101,10 +100,12 @@ task convert_opencell_stardist_task {
         export HDF5_USE_FILE_LOCKING=FALSE
         >&2 parallel --retries 10 --verbose --tag 'echo "shard {} start" && cd shards/{} && python3 /SubCell/convert_opencell_stardist.py && echo "shard {} done"' ::: $(seq 1 ~{shards})
 
-        # collect all output files into a single directory
-        mkdir -p opencell
-        find shards -name '*.png' -exec mv {} opencell/ \;
-        n_images_out=$(ls -1 opencell | wc -l)
+        # collect all output files into one directory tree
+        find shards -name '*.png' > all_png.txt
+        mkdir -p opencell/intermediate opencell/resized
+        fgrep _resized.png all_png.txt | xargs -P 16 -I{} mv {} opencell/resized/
+        fgrep -v _resized.png all_png.txt | xargs -P 16 -I{} mv {} opencell/intermediate/
+        n_images_out=$(find opencell -name '*.png' | wc -l)
         >&2 echo "Images out: $n_images_out"
 
         # concatenate all the shards' metadata.csv (avoiding duplicating the header line)
@@ -115,7 +116,7 @@ task convert_opencell_stardist_task {
     runtime {
         docker: docker
         cpu: cpu
-        memory: "${cpu*4}G"
+        memory: "${cpu*3}G"
     }
 
     output {

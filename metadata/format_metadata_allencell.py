@@ -18,6 +18,7 @@ meta_allen_upstream["gene_name"] = meta_allen_upstream["structure_name"].str.rep
 
 # Add Ensembl ID by matching gene name
 # Load conversion table from https://www.ensembl.org/biomart/martview Ensembl Genes 112
+# Used Ensembl ID for the allele that was tagged
 gene_id = pd.read_table(os.path.join(here, "AllenCell_biomart_export_ensembl112.tsv"))
 
 meta_allen_upstream_ensembl = meta_allen_upstream.merge(gene_id, how="left", left_on="gene_name", right_on="Gene name")

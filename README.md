@@ -1,7 +1,9 @@
-# Subcell Evaluation Data
+# Data Processing for SubCell Evaluation 
 This repo contains the code to: 
-- Process OpenCell data (license and more infomration see https://opencell.czbiohub.org/download) for evaluating the SubCell models. 
+- Process OpenCell data for evaluating the SubCell models. 
 - Put the above processed data into an appropriate S3 bucket.
+
+For license and more information about OpenCell data please see https://opencell.czbiohub.org/download.
 
 ## Overview
 

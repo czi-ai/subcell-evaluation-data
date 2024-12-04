@@ -1,8 +1,7 @@
-# Subcell Data
+# Subcell Evaluation Data
 This repo contains the code to: 
-- Process OpenCell and AllenCell data for SubCell benchmarking.
-- Put the above processed data into an appropriate S3 bucket for our AI residents.
-- Gather all datasets used in the SubCell paper to a public location to accompany paper publication. 
+- Process OpenCell data (license and more infomration see https://opencell.czbiohub.org/download) for evaluating the SubCell models. 
+- Put the above processed data into an appropriate S3 bucket.
 
 ## Overview
 

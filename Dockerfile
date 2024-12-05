@@ -21,5 +21,5 @@ RUN pip3 install --break-system-packages \
 ADD https://github.com/stardist/stardist-models/releases/download/v0.1/python_2D_versatile_fluo.zip /root/.keras/models/StarDist2D/2D_versatile_fluo/2D_versatile_fluo.zip
 
 RUN mkdir /SubCell
-COPY convert_allencell.py convert_opencell_stardist.py /SubCell/
+COPY convert_opencell_stardist.py /SubCell/
 COPY metadata /SubCell/metadata

@@ -29,15 +29,19 @@ miniwdl-omics-run convert_opencell_stardist.wdl \
     --role poweromics --output-uri s3://OUR-BUCKET/out/
 ```
 
-## Data Processing
+## Data Processing and Access
 
 The maximum-intensity z-projection images from OpenCell were used. The nuclei were identified with [StardDist](https://stardist.net/) and crops of 256 x 256 pixels were generated centering around each identified nucleus. These images can be found in the `intermediate/` subfolder. 
 
 The cropped images were further resized from the original pixel size of OpenCell images of 0.206349 μm/pixel to 0.0800885 μm/pixel in order to match that of the training data of SubCell, and the images were resized accordingly to be 640 x 640 pixels. These images can be found in the `resized/` subfolder.
 
+All processed data alongside a metadata table can be accessed in `aws s3 ls --no-sign-request s3://czi-subcell-public/opencell-processed/`
+
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [code of conduct](https://github.com/chanzuckerberg/.github/blob/master/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [opensource@chanzuckerberg.com](mailto:opensource@chanzuckerberg.com).
+
+Responsible Use: We are committed to advancing the responsible development and use of artificial intelligence. Please follow our [Acceptable Use Policy](https://virtualcellmodels.cziscience.com/acceptable-use-policy) when using our services.
 
 ## Reporting Security Issues
 
